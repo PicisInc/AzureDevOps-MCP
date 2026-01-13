@@ -7,6 +7,7 @@ import { IRequestHandler, IHttpClient, IRequestInfo, IHttpClientResponse } from 
  * Only works on Windows OS with win-sso package.
  */
 export class WindowsSsoHandler implements IRequestHandler {
+  private WinSso: any;
   private winSso: any;
   private targetHost: string;
   private securityPackage: string;
@@ -26,12 +27,13 @@ export class WindowsSsoHandler implements IRequestHandler {
       throw new Error('Windows SSO authentication is only supported on Windows OS');
     }
 
-    // Try to load win-sso package
+    // Load win-sso package once
     try {
       const WinSsoModule = require('win-sso');
       if (!WinSsoModule.osSupported()) {
         throw new Error('Windows SSO is not supported on this platform');
       }
+      this.WinSso = WinSsoModule.WinSso;
     } catch (error: any) {
       throw new Error(`Failed to load win-sso package: ${error.message}`);
     }
@@ -70,11 +72,10 @@ export class WindowsSsoHandler implements IRequestHandler {
     requestInfo: IRequestInfo,
     objs: any
   ): Promise<IHttpClientResponse> {
-    const WinSso = require('win-sso').WinSso;
-
     // Create a new WinSso instance for this authentication attempt
     // Each connection should have its own instance
-    this.winSso = new WinSso(this.securityPackage, this.targetHost, undefined, undefined);
+    // Parameters: securityPackage, targetHost, peerCert (undefined for http), flags (undefined for defaults)
+    this.winSso = new this.WinSso(this.securityPackage, this.targetHost, undefined, undefined);
 
     try {
       // Step 1: Send initial authentication request
