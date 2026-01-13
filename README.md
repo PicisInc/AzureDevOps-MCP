@@ -220,6 +220,11 @@ AZURE_DEVOPS_PERSONAL_ACCESS_TOKEN=your-personal-access-token
 
 #### Alternative Authentication Methods (On-Premises)
 ```bash
+# Windows SSO Authentication (uses current Windows session)
+# Only works on Windows OS when already logged in to domain
+AZURE_DEVOPS_AUTH_TYPE=windows
+AZURE_DEVOPS_SECURITY_PACKAGE=Negotiate  # Optional: 'Negotiate' (default) or 'NTLM'
+
 # NTLM Authentication
 AZURE_DEVOPS_AUTH_TYPE=ntlm
 AZURE_DEVOPS_USERNAME=your-username
@@ -307,11 +312,12 @@ For Azure DevOps Server (on-premises), create the PAT in your on-premises instan
 | AZURE_DEVOPS_IS_ON_PREMISES | Whether using Azure DevOps Server | No | false |
 | AZURE_DEVOPS_COLLECTION | Collection name for on-premises | No* | - |
 | AZURE_DEVOPS_API_VERSION | API version for on-premises | No | - |
-| AZURE_DEVOPS_AUTH_TYPE | Authentication type (pat/ntlm/basic/entra) | No | pat |
+| AZURE_DEVOPS_AUTH_TYPE | Authentication type (pat/ntlm/basic/entra/windows) | No | pat |
 | AZURE_DEVOPS_PERSONAL_ACCESS_TOKEN | Personal access token (for 'pat' auth) | No** | - |
 | AZURE_DEVOPS_USERNAME | Username for NTLM/Basic auth | No** | - |
 | AZURE_DEVOPS_PASSWORD | Password for NTLM/Basic auth | No** | - |
 | AZURE_DEVOPS_DOMAIN | Domain for NTLM auth | No | - |
+| AZURE_DEVOPS_SECURITY_PACKAGE | Security package for Windows auth (Negotiate/NTLM) | No | Negotiate |
 | ALLOWED_TOOLS | Comma-separated list of tool methods to enable | No | All tools |
 
 \* Required if `AZURE_DEVOPS_IS_ON_PREMISES=true`  

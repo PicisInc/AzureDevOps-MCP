@@ -66,7 +66,7 @@ export function getAzureDevOpsConfig(): AzureDevOpsConfig {
 
   // Authentication configuration
   const authTypeInput = process.env.AZURE_DEVOPS_AUTH_TYPE || 'pat';
-  const authType = (authTypeInput === 'ntlm' || authTypeInput === 'basic' || authTypeInput === 'pat' || authTypeInput === 'entra')
+  const authType = (authTypeInput === 'ntlm' || authTypeInput === 'basic' || authTypeInput === 'pat' || authTypeInput === 'entra' || authTypeInput === 'windows')
     ? authTypeInput
     : 'pat';
 
@@ -79,6 +79,20 @@ export function getAzureDevOpsConfig(): AzureDevOpsConfig {
     auth = { type: 'entra' };
   } else if (isOnPremises) {
     switch (authType) {
+      case 'windows':
+        // Windows SSO authentication using current session
+        if (process.platform !== 'win32') {
+          throw new Error('Windows SSO authentication is only supported on Windows OS.');
+        }
+        const securityPackageInput = process.env.AZURE_DEVOPS_SECURITY_PACKAGE;
+        const securityPackage = (securityPackageInput === 'NTLM' || securityPackageInput === 'Negotiate') 
+          ? securityPackageInput 
+          : 'Negotiate';
+        auth = {
+          type: 'windows',
+          securityPackage
+        };
+        break;
       case 'ntlm':
         if (!process.env.AZURE_DEVOPS_USERNAME || !process.env.AZURE_DEVOPS_PASSWORD) {
           throw new Error('NTLM authentication requires username and password.');
