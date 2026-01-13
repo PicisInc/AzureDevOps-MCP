@@ -13,6 +13,7 @@ import * as VsoBaseInterfaces from "azure-devops-node-api/interfaces/common/VsoB
 import {
   IRequestHandler,
 } from "azure-devops-node-api/interfaces/common/VsoBaseInterfaces";
+import { WindowsSsoHandler } from "./WindowsSsoHandler";
 
 export class AzureDevOpsService {
   protected connection: azdev.WebApi;
@@ -38,6 +39,25 @@ export class AzureDevOpsService {
       this.authHandler = config.entraAuthHandler;
     } else if (config.isOnPremises && config.auth) {
       switch (config.auth.type) {
+        case 'windows':
+          // Windows SSO authentication using current session
+          if (process.platform !== 'win32') {
+            throw new Error(
+              "Windows SSO authentication is only supported on Windows OS"
+            );
+          }
+          try {
+            // Extract hostname from org URL for SPN
+            const url = new URL(config.orgUrl);
+            const targetHost = url.hostname;
+            const securityPackage = config.auth.securityPackage || 'Negotiate';
+            this.authHandler = new WindowsSsoHandler(targetHost, securityPackage);
+          } catch (error: any) {
+            throw new Error(
+              `Failed to initialize Windows SSO authentication: ${error.message}`
+            );
+          }
+          break;
         case 'ntlm':
           if (!config.auth.username || !config.auth.password) {
             throw new Error(

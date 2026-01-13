@@ -3,7 +3,7 @@ import { EntraAuthHandler } from "../Services/EntraAuthHandler";
 /**
  * Defines the possible authentication types for Azure DevOps.
  */
-export type AzureDevOpsAuthType = 'pat' | 'ntlm' | 'basic' | 'entra';
+export type AzureDevOpsAuthType = 'pat' | 'ntlm' | 'basic' | 'entra' | 'windows';
 
 /**
  * Configuration for Personal Access Token (PAT) authentication.
@@ -39,9 +39,17 @@ export interface AzureIdentityAuth {
 }
 
 /**
+ * Configuration for Windows SSO authentication using current session.
+ */
+export interface WindowsSsoAuth {
+  type: 'windows';
+  securityPackage?: 'NTLM' | 'Negotiate'; // Defaults to 'Negotiate' if not specified
+}
+
+/**
  * Union type for all possible Azure DevOps authentication configurations.
  */
-export type AzureDevOpsAuthConfig = PatAuth | NtlmAuth | BasicAuth | AzureIdentityAuth;
+export type AzureDevOpsAuthConfig = PatAuth | NtlmAuth | BasicAuth | AzureIdentityAuth | WindowsSsoAuth;
 
 /**
  * Interface for Azure DevOps configuration
